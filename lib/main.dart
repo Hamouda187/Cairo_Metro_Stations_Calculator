@@ -21,230 +21,39 @@ class MetroStationsCalculatorApp extends StatelessWidget {
   }
 }
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class MetroMapPage extends StatelessWidget {
+  const MetroMapPage({super.key});
 
   @override
-  _HomePageState createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
-  String? startStation;
-  String? endStation;
-  late AnimationController _controller;
-  late Animation<double> _animation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
-    _animation = Tween<double>(begin: 1.0, end: 1.1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  final List<String> line1 = [
-    'New El-Marg', 'El-Marg', 'Ezbet El-Nakhl', 'Ain Shams', 'El-Matareyya',
-    'Helmeyet El-Zaitoun', 'Hadayeq El-Zaitoun', 'Saray El-Qobba',
-    'Hammamat El-Qobba', 'Kobri El-Qobba', 'Manshiet El-Sadr', 'El-Demerdash',
-    'Ghamra', 'Al-Shohadaa', 'Orabi', 'Nasser', 'Sadat', 'Saad Zaghloul',
-    'Sayyeda Zeinab', 'El-Malek El-Saleh', 'Mar Girgis', 'El-Zahraa',
-    'Dar El-Salam', 'Hadayeq El-Maadi', 'Maadi', 'Sakanat El-Maadi',
-    'Tora El-Balad', 'Kozzika', 'Tora El-Asmant', 'El-Maasara',
-    'Hadayeq Helwan', 'Wadi Hof', 'Helwan University', 'Ain Helwan', 'Helwan'
-  ];
-
-  final List<String> line2 = [
-    'Shubra El-Kheima', 'Kolleyet El-Zeraa', 'El-Massara', 'Road El-Farag',
-    'St. Teresa', 'Khalafawy', 'Mezallat', 'Sakia Mekki', 'Al-Shohadaa',
-    'Ataba', 'Mohamed Naguib', 'Sadat', 'Opera', 'Dokki', 'El Behoos',
-    'Cairo University', 'Faisal', 'Giza', 'Omm El-Misryeen', 'Sakiat Mekki',
-    'El-Monib'
-  ];
-
-  final List<String> line3 = [
-    "Adly Mansour", "El Haykestep", "Omar Ibn El Khattab", "Qobaa",
-    "Hesham Barakat", "El Nozha", "Nadi El Shams", "Alf Maskan", "Heliopolis",
-    "Haroun", "Al Ahram", "Koleyet El Banat", "Cairo Stadium", "Fair Zone",
-    "Abbassiya", "Abdou Pasha", "El Geish", "Bab El Shaaria", "Ataba",
-    "Nasser", "Maspero", "Safaa Hegazy", "KitKat"
-  ];
-
-  final List<String> line3Pt2 = [
-    "KitKat", "Tawfikia", "Wadi El Nile", "Gamet El Dowal", "Bulaq El Dakrour",
-    "Cairo University"
-  ];
-
-  final List<String> line3Pt3 = [
-    "KitKat", "Sudan", "Imbaba", "El Bohy", "El-Qawmia", "Ring Road",
-    "Rod El Farag"
-  ];
-
-  final List<String> exchangeStations = ['Sadat', 'Ataba', 'Nasser', 'Al-Shohadaa', 'KitKat'];
-
-  List<String> getAllStations() {
-    final allStations = <String>{};
-    allStations.addAll(line1);
-    allStations.addAll(line2);
-    allStations.addAll(line3);
-    allStations.addAll(line3Pt2);
-    allStations.addAll(line3Pt3);
-    return allStations.toList()..sort();
-  }
-
-  void calculateRoute() {
-    if (startStation == null || endStation == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select both start and end stations')),
-      );
-      return;
-    }
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ResultPage(
-          start: startStation!,
-          end: endStation!,
-          line1: line1,
-          line2: line2,
-          line3: line3,
-          line3Pt2: line3Pt2,
-          line3Pt3: line3Pt3,
-          exchangeStations: exchangeStations,
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Metro Map'),
+        backgroundColor: Colors.blueAccent,
+        elevation: 0,
+      ),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Colors.blueAccent, Colors.teal],
+          ),
+        ),
+        child: Center(
+          child: Image.asset(
+            'assets/metro_map.png',
+            fit: BoxFit.contain,
+            width: double.infinity,
+            height: double.infinity,
+          ),
         ),
       ),
     );
   }
-
-  @override
-  Widget build(BuildContext context) {
-    final allStations = getAllStations();
-
-    return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Colors.blueAccent, Colors.teal],
-              ),
-            ),
-            child: Opacity(
-              opacity: 0.1,
-              child: Center(
-                child: Image.asset(
-                  'assets/egypt_metro_logo.png',
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: double.infinity,
-                ),
-              ),
-            ),
-          ),
-          Column(
-            children: [
-              AppBar(
-                title: const Text(
-                  'Metro Stations Calculator',
-                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-                ),
-                leading: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Image.asset('assets/egypt_metro_logo.png'),
-                ),
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 40.0),
-                  child: Card(
-                    elevation: 10,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          DropdownButtonFormField<String>(
-                            decoration: InputDecoration(
-                              labelText: 'Start Station',
-                              prefixIcon: const Icon(Icons.train, color: Colors.blueAccent),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              filled: true,
-                              fillColor: Colors.grey[100],
-                            ),
-                            items: allStations.map((station) {
-                              return DropdownMenuItem(value: station, child: Text(station));
-                            }).toList(),
-                            onChanged: (value) => setState(() => startStation = value),
-                            value: startStation,
-                          ),
-                          const SizedBox(height: 20),
-                          DropdownButtonFormField<String>(
-                            decoration: InputDecoration(
-                              labelText: 'End Station',
-                              prefixIcon: const Icon(Icons.train, color: Colors.blueAccent),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              filled: true,
-                              fillColor: Colors.grey[100],
-                            ),
-                            items: allStations.map((station) {
-                              return DropdownMenuItem(value: station, child: Text(station));
-                            }).toList(),
-                            onChanged: (value) => setState(() => endStation = value),
-                            value: endStation,
-                          ),
-                          const SizedBox(height: 40),
-                          ScaleTransition(
-                            scale: _animation,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                _controller.forward().then((_) => _controller.reverse());
-                                calculateRoute();
-                              },
-                              style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                backgroundColor: Colors.blueAccent,
-                                elevation: 5,
-                              ),
-                              child: const Text(
-                                'Calculate Route',
-                                style: TextStyle(fontSize: 18, color: Colors.white),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 }
 
+// Moved ResultPage before HomePage
 class ResultPage extends StatelessWidget {
   final String start;
   final String end;
@@ -296,7 +105,6 @@ class ResultPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Stations
                     _buildSection(
                       title: 'Stations',
                       icon: Icons.train,
@@ -307,8 +115,6 @@ class ResultPage extends StatelessWidget {
                       ],
                     ),
                     const Divider(),
-
-                    // Pricing and Stats
                     if (result['ticketPrice'] != null) ...[
                       _buildSection(
                         title: 'Pricing & Stats',
@@ -321,8 +127,6 @@ class ResultPage extends StatelessWidget {
                       ),
                       const Divider(),
                     ],
-
-                    // Directions
                     if (result['directions'] != null)
                       _buildSection(
                         title: 'Directions',
@@ -334,8 +138,6 @@ class ResultPage extends StatelessWidget {
                           ),
                         ],
                       ),
-
-                    // Exchange (if applicable)
                     if (result['exchange'] != null) ...[
                       const Divider(),
                       _buildSection(
@@ -349,8 +151,6 @@ class ResultPage extends StatelessWidget {
                         ],
                       ),
                     ],
-
-                    // Route
                     if (result['route'] != null) ...[
                       const Divider(),
                       _buildSection(
@@ -364,8 +164,6 @@ class ResultPage extends StatelessWidget {
                         ],
                       ),
                     ],
-
-                    // Error or Message
                     if (result['error'] != null)
                       _buildSection(
                         title: 'Message',
@@ -626,5 +424,255 @@ class ResultPage extends StatelessWidget {
       'exchange': nearestChangeStation,
       'route': routeSet.join(' => '),
     };
+  }
+}
+
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
+  String? startStation;
+  String? endStation;
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _animation = Tween<double>(begin: 1.0, end: 1.1).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  final List<String> line1 = [
+    'New El-Marg', 'El-Marg', 'Ezbet El-Nakhl', 'Ain Shams', 'El-Matareyya',
+    'Helmeyet El-Zaitoun', 'Hadayeq El-Zaitoun', 'Saray El-Qobba',
+    'Hammamat El-Qobba', 'Kobri El-Qobba', 'Manshiet El-Sadr', 'El-Demerdash',
+    'Ghamra', 'Al-Shohadaa', 'Orabi', 'Nasser', 'Sadat', 'Saad Zaghloul',
+    'Sayyeda Zeinab', 'El-Malek El-Saleh', 'Mar Girgis', 'El-Zahraa',
+    'Dar El-Salam', 'Hadayeq El-Maadi', 'Maadi', 'Sakanat El-Maadi',
+    'Tora El-Balad', 'Kozzika', 'Tora El-Asmant', 'El-Maasara',
+    'Hadayeq Helwan', 'Wadi Hof', 'Helwan University', 'Ain Helwan', 'Helwan'
+  ];
+
+  final List<String> line2 = [
+    'Shubra El-Kheima', 'Kolleyet El-Zeraa', 'Mezallat', 'Khalafawy', 'St. Teresa', 'Road El-Farag',
+    'El-Massara', 'Al-Shohadaa', 'Ataba', 'Mohamed Naguib', 'Sadat', 'Opera', 'Dokki', 'El Behoos',
+    'Cairo University', 'Faisal', 'Giza', 'Omm El-Misryeen', 'Sakiat Mekki',
+    'El-Monib'
+  ];
+
+  final List<String> line3 = [
+    "Adly Mansour", "El Haykestep", "Omar Ibn El Khattab", "Qobaa",
+    "Hesham Barakat", "El Nozha", "Nadi El Shams", "Alf Maskan", "Heliopolis",
+    "Haroun", "Al Ahram", "Koleyet El Banat", "Cairo Stadium", "Fair Zone",
+    "Abbassiya", "Abdou Pasha", "El Geish", "Bab El Shaaria", "Ataba",
+    "Nasser", "Maspero", "Safaa Hegazy", "KitKat"
+  ];
+
+  final List<String> line3Pt2 = [
+    "KitKat", "Tawfikia", "Wadi El Nile", "Gamet El Dowal", "Bulaq El Dakrour",
+    "Cairo University"
+  ];
+
+  final List<String> line3Pt3 = [
+    "KitKat", "Sudan", "Imbaba", "El Bohy", "El-Qawmia", "Ring Road",
+    "Rod El Farag Corridor"
+  ];
+
+  final List<String> exchangeStations = ['Sadat', 'Ataba', 'Nasser', 'Al-Shohadaa', 'KitKat'];
+
+  List<String> getAllStations() {
+    final allStations = <String>{};
+    allStations.addAll(line1);
+    allStations.addAll(line2);
+    allStations.addAll(line3);
+    allStations.addAll(line3Pt2);
+    allStations.addAll(line3Pt3);
+    return allStations.toList()..sort();
+  }
+
+  void calculateRoute() {
+    if (startStation == null || endStation == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select both start and end stations')),
+      );
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ResultPage(
+          start: startStation!,
+          end: endStation!,
+          line1: line1,
+          line2: line2,
+          line3: line3,
+          line3Pt2: line3Pt2,
+          line3Pt3: line3Pt3,
+          exchangeStations: exchangeStations,
+        ),
+      ),
+    );
+  }
+
+  void showMetroMap() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const MetroMapPage(),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final allStations = getAllStations();
+
+    return Scaffold(
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Colors.blueAccent, Colors.teal],
+              ),
+            ),
+            child: Opacity(
+              opacity: 0.1,
+              child: Center(
+                child: Image.asset(
+                  'assets/egypt_metro_logo.png',
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
+                ),
+              ),
+            ),
+          ),
+          Column(
+            children: [
+              AppBar(
+                title: const Text(
+                  'Metro Stations Calculator',
+                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                leading: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Image.asset('assets/egypt_metro_logo.png'),
+                ),
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 40.0),
+                  child: Card(
+                    elevation: 10,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          DropdownButtonFormField<String>(
+                            decoration: InputDecoration(
+                              labelText: 'Start Station',
+                              prefixIcon: const Icon(Icons.train, color: Colors.blueAccent),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              filled: true,
+                              fillColor: Colors.grey[100],
+                            ),
+                            items: allStations.map((station) {
+                              return DropdownMenuItem(value: station, child: Text(station));
+                            }).toList(),
+                            onChanged: (value) => setState(() => startStation = value),
+                            value: startStation,
+                          ),
+                          const SizedBox(height: 20),
+                          DropdownButtonFormField<String>(
+                            decoration: InputDecoration(
+                              labelText: 'End Station',
+                              prefixIcon: const Icon(Icons.train, color: Colors.blueAccent),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              filled: true,
+                              fillColor: Colors.grey[100],
+                            ),
+                            items: allStations.map((station) {
+                              return DropdownMenuItem(value: station, child: Text(station));
+                            }).toList(),
+                            onChanged: (value) => setState(() => endStation = value),
+                            value: endStation,
+                          ),
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              ScaleTransition(
+                                scale: _animation,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    _controller.forward().then((_) => _controller.reverse());
+                                    calculateRoute();
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                    backgroundColor: Colors.blueAccent,
+                                    elevation: 5,
+                                  ),
+                                  child: const Text(
+                                    'Calculate Route',
+                                    style: TextStyle(fontSize: 18, color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                              ElevatedButton(
+                                onPressed: showMetroMap,
+                                style: ElevatedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  backgroundColor: Colors.teal,
+                                  elevation: 5,
+                                ),
+                                child: const Text(
+                                  'Show Metro Map',
+                                  style: TextStyle(fontSize: 18, color: Colors.white),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }
