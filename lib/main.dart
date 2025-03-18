@@ -40,10 +40,10 @@ class MetroMapPage extends StatelessWidget {
             colors: [Colors.blueAccent, Colors.teal],
           ),
         ),
-        child: InteractiveViewer( // Wrapped the image in InteractiveViewer
-          boundaryMargin: const EdgeInsets.all(20.0), // Margin for panning
-          minScale: 0.5, // Minimum zoom level (50% of original size)
-          maxScale: 4.0, // Maximum zoom level (400% of original size)
+        child: InteractiveViewer(
+          boundaryMargin: const EdgeInsets.all(20.0),
+          minScale: 0.5,
+          maxScale: 4.0,
           child: Center(
             child: Image.asset(
               'assets/metro_map.png',
@@ -174,16 +174,29 @@ class ResultPage extends StatelessWidget {
   Map<String, String?> routePrint(int endIndex, int startIndex, List<String> metroLine) {
     String direction;
     String route;
+
     if (endIndex > startIndex) {
+      direction = 'Towards: ${metroLine[metroLine.length - 1]}';
       final routeList = metroLine.sublist(startIndex, endIndex + 1);
-      direction = 'Direction: ${metroLine[metroLine.length - 1]}';
-      route = routeList.join(' => ');
+      route = routeList
+          .asMap()
+          .entries
+          .map((entry) => '${entry.key + 1}. ${entry.value}')
+          .join('\n');
     } else {
+      direction = 'Towards: ${metroLine[0]}';
       final routeList = metroLine.sublist(endIndex, startIndex + 1).reversed.toList();
-      direction = 'Direction: ${metroLine[0]}';
-      route = routeList.join(' => ');
+      route = routeList
+          .asMap()
+          .entries
+          .map((entry) => '${entry.key + 1}. ${entry.value}')
+          .join('\n');
     }
-    return {'directions': direction, 'route': route};
+
+    return {
+      'directions': direction,
+      'route': 'Your Route:\n$route',
+    };
   }
 
   Map<String, String?> oneLine({required String start, required String end, required List<String> metroLine}) {
@@ -206,17 +219,43 @@ class ResultPage extends StatelessWidget {
     var combinedLine = [...metroLine.reversed, ...metroLine2];
     final startIndex = combinedLine.indexOf(start);
     final endIndex = combinedLine.indexOf(end);
+    final exchangeStation = metroLine2[0]; // The exchange station (e.g., "KitKat")
+    final exchangeIndex = combinedLine.indexOf(exchangeStation);
     final calc = calculations(startIndex, endIndex);
-    final route = routePrint(endIndex, startIndex, combinedLine);
+
+    late String direction;
+    String route;
+
+    if (endIndex > startIndex) {
+      direction = 'Towards: ${combinedLine[combinedLine.length - 1]}';
+    } else {
+      direction = 'Towards: ${combinedLine[0]}';
+    }
+
+    // Build the route without duplicating the exchange station
+    final firstLeg = startIndex < exchangeIndex
+        ? combinedLine.sublist(startIndex, exchangeIndex) // Up to but not including exchange
+        : combinedLine.sublist(exchangeIndex + 1, startIndex + 1).reversed.toList();
+    final secondLeg = endIndex > exchangeIndex
+        ? combinedLine.sublist(exchangeIndex + 1, endIndex + 1)
+        : combinedLine.sublist(endIndex, exchangeIndex).reversed.toList();
+
+    final routeList = [
+      ...firstLeg,
+      exchangeStation, // Add exchange station once
+      ...secondLeg,
+    ];
+    route = 'Your Route:\n${routeList.asMap().entries.map((e) => '${e.key + 1}. ${e.value}').join('\n')}';
+
     return {
       'start': combinedLine[startIndex],
       'end': combinedLine[endIndex],
       'ticketPrice': calc['ticketPrice'],
       'stationsCount': calc['stationsCount'],
       'estimatedTime': calc['estimatedTime'],
-      'exchange': metroLine2[0],
-      'directions': route['directions'],
-      'route': route['route'],
+      'exchange': exchangeStation,
+      'directions': direction,
+      'route': route,
     };
   }
 
@@ -269,15 +308,33 @@ class ResultPage extends StatelessWidget {
     }
 
     final calc = calculations(0, routeSet.length - 1);
+
+    final firstLeg = exchangeIndex1 > startIndex
+        ? metroLine1.sublist(startIndex, exchangeIndex1)
+        : metroLine1.sublist(exchangeIndex1 + 1, startIndex + 1).reversed.toList();
+    final secondLeg = exchangeIndex2 > endIndex
+        ? metroLine2.sublist(endIndex, exchangeIndex2).reversed.toList()
+        : metroLine2.sublist(exchangeIndex2 + 1, endIndex + 1);
+
+    final routeList = [
+      ...firstLeg,
+      nearestChangeStation, // Add exchange station once
+      ...secondLeg,
+    ];
+    final route = 'Your Route:\n${routeList.asMap().entries.map((e) => '${e.key + 1}. ${e.value}').join('\n')}';
+
+    String line1Name = metroLine1 == line1 ? 'Line 1' : metroLine1 == line2 ? 'Line 2' : 'Line 3';
+    String line2Name = metroLine2 == line1 ? 'Line 1' : metroLine2 == line2 ? 'Line 2' : 'Line 3';
+
     return {
       'start': start,
       'end': end,
       'ticketPrice': calc['ticketPrice'],
       'stationsCount': calc['stationsCount'],
       'estimatedTime': calc['estimatedTime'],
-      'directions': '$direction1 Direction => Exchange in $nearestChangeStation Station => $direction2 Direction',
+      'directions': 'Take $line1Name towards $direction1\nExchange at $nearestChangeStation to $line2Name\nContinue towards $direction2',
       'exchange': nearestChangeStation,
-      'route': routeSet.join(' => '),
+      'route': route,
     };
   }
 
@@ -285,9 +342,39 @@ class ResultPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final result = calculateRoute();
 
+    // Determine ticket price color and style
+    Color ticketPriceColor;
+    List<Shadow>? ticketPriceShadows;
+    switch (result['ticketPrice']) {
+      case '8 L.E.':
+        ticketPriceColor = Colors.yellow;
+        ticketPriceShadows = null;
+        break;
+      case '10 L.E.':
+        ticketPriceColor = Colors.green;
+        ticketPriceShadows = null;
+        break;
+      case '15 L.E.':
+        ticketPriceColor = Colors.pink;
+        ticketPriceShadows = null;
+        break;
+      case '20 L.E.':
+        ticketPriceColor = const Color(0xFFF5F5DC); // Beige
+        ticketPriceShadows = [
+          const Shadow(offset: Offset(1.0, 1.0), blurRadius: 1.0, color: Colors.black),
+          const Shadow(offset: Offset(-1.0, -1.0), blurRadius: 1.0, color: Colors.black),
+          const Shadow(offset: Offset(1.0, -1.0), blurRadius: 1.0, color: Colors.black),
+          const Shadow(offset: Offset(-1.0, 1.0), blurRadius: 1.0, color: Colors.black),
+        ];
+        break;
+      default:
+        ticketPriceColor = Colors.green;
+        ticketPriceShadows = null;
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Your Metro Route', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Your Metro Route', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
         backgroundColor: Colors.blueAccent,
         elevation: 0,
       ),
@@ -313,58 +400,80 @@ class ResultPage extends StatelessWidget {
                     _buildSection(
                       title: 'Stations',
                       icon: Icons.train,
+                      iconColor: Colors.deepPurple,
                       content: [
                         _buildRow('Start', start, Colors.blueAccent),
                         const SizedBox(height: 8),
-                        _buildRow('End', end, Colors.blueAccent),
+                        _buildRow('End', end, Colors.redAccent),
                       ],
                     ),
-                    const Divider(),
+                    const Divider(color: Colors.grey),
                     if (result['ticketPrice'] != null) ...[
                       _buildSection(
                         title: 'Pricing & Stats',
                         icon: Icons.info,
+                        iconColor: Colors.orange,
                         content: [
-                          _buildRow('Ticket Price', result['ticketPrice']!, Colors.green),
+                          _buildRowWithShadows('Ticket Price', result['ticketPrice']!, ticketPriceColor, ticketPriceShadows),
                           _buildRow('Stations Count', result['stationsCount']!, Colors.orange),
                           _buildRow('Estimated Time', result['estimatedTime']!, Colors.purple),
                         ],
                       ),
-                      const Divider(),
+                      const Divider(color: Colors.grey),
                     ],
                     if (result['directions'] != null)
                       _buildSection(
                         title: 'Directions',
                         icon: Icons.directions,
+                        iconColor: Colors.teal,
                         content: [
-                          Text(
-                            result['directions']!,
-                            style: const TextStyle(fontSize: 16, color: Colors.black87),
+                          RichText(
+                            text: result['directions']!.contains('\n')
+                                ? TextSpan(
+                              style: const TextStyle(fontSize: 16, fontFamily: 'Roboto'),
+                              children: [
+                                const TextSpan(text: 'Step 1: ', style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold)),
+                                TextSpan(text: result['directions']!.split('\n')[0], style: const TextStyle(color: Colors.black87)),
+                                const TextSpan(text: '\nStep 2: ', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                                TextSpan(text: result['directions']!.split('\n')[1], style: const TextStyle(color: Colors.black87)),
+                                const TextSpan(text: '\nStep 3: ', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+                                TextSpan(text: result['directions']!.split('\n')[2], style: const TextStyle(color: Colors.black87)),
+                              ],
+                            )
+                                : TextSpan(
+                              style: const TextStyle(fontSize: 16, fontFamily: 'Roboto'),
+                              children: [
+                                const TextSpan(text: 'Step 1: ', style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold)),
+                                TextSpan(text: result['directions']!, style: const TextStyle(color: Colors.black87)),
+                              ],
+                            ),
                           ),
                         ],
                       ),
                     if (result['exchange'] != null) ...[
-                      const Divider(),
+                      const Divider(color: Colors.grey),
                       _buildSection(
                         title: 'Exchange At',
                         icon: Icons.swap_horiz,
+                        iconColor: Colors.deepOrange,
                         content: [
                           Text(
                             result['exchange']!,
-                            style: const TextStyle(fontSize: 16, color: Colors.black87),
+                            style: const TextStyle(fontSize: 16, color: Colors.deepOrangeAccent),
                           ),
                         ],
                       ),
                     ],
                     if (result['route'] != null) ...[
-                      const Divider(),
+                      const Divider(color: Colors.grey),
                       _buildSection(
                         title: 'Route',
                         icon: Icons.map,
+                        iconColor: Colors.indigo,
                         content: [
                           Text(
                             result['route']!,
-                            style: const TextStyle(fontSize: 16, color: Colors.black87),
+                            style: const TextStyle(fontSize: 16, color: Colors.indigo),
                           ),
                         ],
                       ),
@@ -373,6 +482,7 @@ class ResultPage extends StatelessWidget {
                       _buildSection(
                         title: 'Message',
                         icon: Icons.warning,
+                        iconColor: Colors.red,
                         content: [
                           Text(
                             result['error']!,
@@ -390,17 +500,17 @@ class ResultPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSection({required String title, required IconData icon, required List<Widget> content}) {
+  Widget _buildSection({required String title, required IconData icon, required List<Widget> content, Color iconColor = Colors.blueAccent}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Icon(icon, color: Colors.blueAccent, size: 28),
+            Icon(icon, color: iconColor, size: 28),
             const SizedBox(width: 8),
             Text(
               title,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: iconColor),
             ),
           ],
         ),
@@ -423,6 +533,25 @@ class ResultPage extends StatelessWidget {
           child: Text(
             value,
             style: TextStyle(fontSize: 16, color: color, fontWeight: FontWeight.w600),
+            textAlign: TextAlign.right,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRowWithShadows(String label, String value, Color color, List<Shadow>? shadows) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          '$label:',
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black54),
+        ),
+        Flexible(
+          child: Text(
+            value,
+            style: TextStyle(fontSize: 16, color: color, fontWeight: FontWeight.w600, shadows: shadows),
             textAlign: TextAlign.right,
           ),
         ),
