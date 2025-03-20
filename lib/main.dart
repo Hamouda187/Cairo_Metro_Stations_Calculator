@@ -219,7 +219,7 @@ class ResultPage extends StatelessWidget {
     var combinedLine = [...metroLine.reversed, ...metroLine2];
     final startIndex = combinedLine.indexOf(start);
     final endIndex = combinedLine.indexOf(end);
-    final exchangeStation = metroLine2[0]; // The exchange station (e.g., "KitKat")
+    final exchangeStation = metroLine2[0];
     final exchangeIndex = combinedLine.indexOf(exchangeStation);
     final calc = calculations(startIndex, endIndex);
 
@@ -232,9 +232,8 @@ class ResultPage extends StatelessWidget {
       direction = 'Towards: ${combinedLine[0]}';
     }
 
-    // Build the route without duplicating the exchange station
     final firstLeg = startIndex < exchangeIndex
-        ? combinedLine.sublist(startIndex, exchangeIndex) // Up to but not including exchange
+        ? combinedLine.sublist(startIndex, exchangeIndex)
         : combinedLine.sublist(exchangeIndex + 1, startIndex + 1).reversed.toList();
     final secondLeg = endIndex > exchangeIndex
         ? combinedLine.sublist(exchangeIndex + 1, endIndex + 1)
@@ -242,7 +241,7 @@ class ResultPage extends StatelessWidget {
 
     final routeList = [
       ...firstLeg,
-      exchangeStation, // Add exchange station once
+      exchangeStation,
       ...secondLeg,
     ];
     route = 'Your Route:\n${routeList.asMap().entries.map((e) => '${e.key + 1}. ${e.value}').join('\n')}';
@@ -318,7 +317,7 @@ class ResultPage extends StatelessWidget {
 
     final routeList = [
       ...firstLeg,
-      nearestChangeStation, // Add exchange station once
+      nearestChangeStation,
       ...secondLeg,
     ];
     final route = 'Your Route:\n${routeList.asMap().entries.map((e) => '${e.key + 1}. ${e.value}').join('\n')}';
@@ -342,34 +341,42 @@ class ResultPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final result = calculateRoute();
 
-    // Determine ticket price color and style
     Color ticketPriceColor;
-    List<Shadow>? ticketPriceShadows;
+    TextStyle ticketPriceStyle;
     switch (result['ticketPrice']) {
       case '8 L.E.':
         ticketPriceColor = Colors.yellow;
-        ticketPriceShadows = null;
+        ticketPriceStyle = TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          foreground: Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1.0
+            ..color = Colors.black,
+        );
         break;
       case '10 L.E.':
         ticketPriceColor = Colors.green;
-        ticketPriceShadows = null;
+        ticketPriceStyle = const TextStyle(fontSize: 16, fontWeight: FontWeight.w600);
         break;
       case '15 L.E.':
         ticketPriceColor = Colors.pink;
-        ticketPriceShadows = null;
+        ticketPriceStyle = const TextStyle(fontSize: 16, fontWeight: FontWeight.w600);
         break;
       case '20 L.E.':
-        ticketPriceColor = const Color(0xFFF5F5DC); // Beige
-        ticketPriceShadows = [
-          const Shadow(offset: Offset(1.0, 1.0), blurRadius: 1.0, color: Colors.black),
-          const Shadow(offset: Offset(-1.0, -1.0), blurRadius: 1.0, color: Colors.black),
-          const Shadow(offset: Offset(1.0, -1.0), blurRadius: 1.0, color: Colors.black),
-          const Shadow(offset: Offset(-1.0, 1.0), blurRadius: 1.0, color: Colors.black),
-        ];
+        ticketPriceColor = const Color(0xFFF5F5DC);
+        ticketPriceStyle = TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          foreground: Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1.0
+            ..color = Colors.black,
+        );
         break;
       default:
         ticketPriceColor = Colors.green;
-        ticketPriceShadows = null;
+        ticketPriceStyle = const TextStyle(fontSize: 16, fontWeight: FontWeight.w600);
     }
 
     return Scaffold(
@@ -414,7 +421,7 @@ class ResultPage extends StatelessWidget {
                         icon: Icons.info,
                         iconColor: Colors.orange,
                         content: [
-                          _buildRowWithShadows('Ticket Price', result['ticketPrice']!, ticketPriceColor, ticketPriceShadows),
+                          _buildRowWithStyle('Ticket Price', result['ticketPrice']!, ticketPriceColor, ticketPriceStyle),
                           _buildRow('Stations Count', result['stationsCount']!, Colors.orange),
                           _buildRow('Estimated Time', result['estimatedTime']!, Colors.purple),
                         ],
@@ -540,7 +547,7 @@ class ResultPage extends StatelessWidget {
     );
   }
 
-  Widget _buildRowWithShadows(String label, String value, Color color, List<Shadow>? shadows) {
+  Widget _buildRowWithStyle(String label, String value, Color color, TextStyle style) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -551,7 +558,7 @@ class ResultPage extends StatelessWidget {
         Flexible(
           child: Text(
             value,
-            style: TextStyle(fontSize: 16, color: color, fontWeight: FontWeight.w600, shadows: shadows),
+            style: style.copyWith(color: color),
             textAlign: TextAlign.right,
           ),
         ),
@@ -762,116 +769,134 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            TextField(
-                              controller: _startSearchController,
-                              decoration: InputDecoration(
-                                labelText: 'Search Start Station',
-                                prefixIcon: const Icon(Icons.search, color: Colors.blueAccent),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                filled: true,
-                                fillColor: Colors.grey[100],
-                              ),
-                            ),
-                            if (showStartDropdown)
-                              Container(
-                                constraints: const BoxConstraints(maxHeight: 200),
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: filteredStartStations.length,
-                                  itemBuilder: (context, index) {
-                                    return ListTile(
-                                      title: Text(filteredStartStations[index]),
-                                      onTap: () {
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                TextField(
+                                  controller: _startSearchController,
+                                  decoration: InputDecoration(
+                                    labelText: 'Start Station',
+                                    prefixIcon: const Icon(Icons.train, color: Colors.blueAccent),
+                                    suffixIcon: PopupMenuButton<String>(
+                                      icon: const Icon(Icons.arrow_drop_down),
+                                      onSelected: (value) {
                                         setState(() {
-                                          _startSearchController.text = filteredStartStations[index];
-                                          startStation = filteredStartStations[index];
+                                          _startSearchController.text = value;
+                                          startStation = value;
                                           showStartDropdown = false;
                                         });
                                       },
-                                    );
-                                  },
+                                      itemBuilder: (context) => allStations
+                                          .map((station) => PopupMenuItem(
+                                        value: station,
+                                        child: Text(station),
+                                      ))
+                                          .toList(),
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.grey[100],
+                                  ),
                                 ),
-                              ),
-                            const SizedBox(height: 10),
-                            DropdownButtonFormField<String>(
-                              decoration: InputDecoration(
-                                labelText: 'Or Select Start Station',
-                                prefixIcon: const Icon(Icons.train, color: Colors.blueAccent),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                filled: true,
-                                fillColor: Colors.grey[100],
-                              ),
-                              items: allStations.map((station) {
-                                return DropdownMenuItem(value: station, child: Text(station));
-                              }).toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  startStation = value;
-                                  _startSearchController.clear();
-                                  showStartDropdown = false;
-                                });
-                              },
-                              value: startStation,
+                                if (showStartDropdown)
+                                  Container(
+                                    constraints: const BoxConstraints(maxHeight: 200),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 2,
+                                          blurRadius: 5,
+                                        ),
+                                      ],
+                                    ),
+                                    child: ListView.builder(
+                                      shrinkWrap: true,
+                                      itemCount: filteredStartStations.length,
+                                      itemBuilder: (context, index) {
+                                        return ListTile(
+                                          title: Text(filteredStartStations[index]),
+                                          onTap: () {
+                                            setState(() {
+                                              _startSearchController.text = filteredStartStations[index];
+                                              startStation = filteredStartStations[index];
+                                              showStartDropdown = false;
+                                            });
+                                          },
+                                        );
+                                      },
+                                    ),
+                                  ),
+                              ],
                             ),
                             const SizedBox(height: 20),
-                            TextField(
-                              controller: _endSearchController,
-                              decoration: InputDecoration(
-                                labelText: 'Search End Station',
-                                prefixIcon: const Icon(Icons.search, color: Colors.blueAccent),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                filled: true,
-                                fillColor: Colors.grey[100],
-                              ),
-                            ),
-                            if (showEndDropdown)
-                              Container(
-                                constraints: const BoxConstraints(maxHeight: 200),
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: filteredEndStations.length,
-                                  itemBuilder: (context, index) {
-                                    return ListTile(
-                                      title: Text(filteredEndStations[index]),
-                                      onTap: () {
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                TextField(
+                                  controller: _endSearchController,
+                                  decoration: InputDecoration(
+                                    labelText: 'End Station',
+                                    prefixIcon: const Icon(Icons.train, color: Colors.blueAccent),
+                                    suffixIcon: PopupMenuButton<String>(
+                                      icon: const Icon(Icons.arrow_drop_down),
+                                      onSelected: (value) {
                                         setState(() {
-                                          _endSearchController.text = filteredEndStations[index];
-                                          endStation = filteredEndStations[index];
+                                          _endSearchController.text = value;
+                                          endStation = value;
                                           showEndDropdown = false;
                                         });
                                       },
-                                    );
-                                  },
+                                      itemBuilder: (context) => allStations
+                                          .map((station) => PopupMenuItem(
+                                        value: station,
+                                        child: Text(station),
+                                      ))
+                                          .toList(),
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.grey[100],
+                                  ),
                                 ),
-                              ),
-                            const SizedBox(height: 10),
-                            DropdownButtonFormField<String>(
-                              decoration: InputDecoration(
-                                labelText: 'Or Select End Station',
-                                prefixIcon: const Icon(Icons.train, color: Colors.blueAccent),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                filled: true,
-                                fillColor: Colors.grey[100],
-                              ),
-                              items: allStations.map((station) {
-                                return DropdownMenuItem(value: station, child: Text(station));
-                              }).toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  endStation = value;
-                                  _endSearchController.clear();
-                                  showEndDropdown = false;
-                                });
-                              },
-                              value: endStation,
+                                if (showEndDropdown)
+                                  Container(
+                                    constraints: const BoxConstraints(maxHeight: 200),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 2,
+                                          blurRadius: 5,
+                                        ),
+                                      ],
+                                    ),
+                                    child: ListView.builder(
+                                      shrinkWrap: true,
+                                      itemCount: filteredEndStations.length,
+                                      itemBuilder: (context, index) {
+                                        return ListTile(
+                                          title: Text(filteredEndStations[index]),
+                                          onTap: () {
+                                            setState(() {
+                                              _endSearchController.text = filteredEndStations[index];
+                                              endStation = filteredEndStations[index];
+                                              showEndDropdown = false;
+                                            });
+                                          },
+                                        );
+                                      },
+                                    ),
+                                  ),
+                              ],
                             ),
                             const SizedBox(height: 20),
                             Column(
