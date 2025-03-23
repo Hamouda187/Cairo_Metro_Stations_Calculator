@@ -153,7 +153,7 @@ class ResultPage extends StatelessWidget {
   }
 
   Map<String, String?> calculations(int startIndex, int endIndex) {
-    final diff = (startIndex - endIndex).abs();
+    final diff = ((startIndex - endIndex).abs())+1;
     String ticketPrice;
     if (diff <= 9) {
       ticketPrice = '8 L.E.';
@@ -644,7 +644,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     "Rod El Farag Corridor"
   ];
 
-  final List<String> exchangeStations = ['Sadat', 'Ataba', 'Nasser', 'Al-Shohadaa', 'KitKat'];
+  final List<String> exchangeStations = ['Sadat', 'Ataba', 'Nasser', 'Al-Shohadaa', 'KitKat','Cairo University'];
 
   List<String> getAllStations() {
     final allStations = <String>{};
