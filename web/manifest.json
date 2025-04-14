@@ -1,6 +1,6 @@
 {
-    "name": "try1",
-    "short_name": "try1",
+    "name": "metro_app",
+    "short_name": "metro_app",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
