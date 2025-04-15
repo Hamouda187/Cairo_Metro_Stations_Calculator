@@ -182,6 +182,12 @@ class detailsPage extends StatelessWidget {
         price.value =f. priceChange(routeLength: stationNum.value);
         exchangeState.value=true;
         exchangeState2.value=true;
+        f.line3.remove("KitKat");
+        f.line3.remove("Tawfikia");
+        f.line3.remove("Wadi El Nile");
+        f.line3.remove("Gamet El Dowal");
+        f.line3.remove("Bulaq El Dakrour");
+        f.line3.remove("Cairo University");
       }
       else if(f.line1.contains(startStation.value)&&(f.line3.contains(endStation.value)  || f.line3Pt3.contains(endStation.value)))//////////FROM 1 TO 3 ROD EL FARAG
           {
@@ -195,6 +201,13 @@ class detailsPage extends StatelessWidget {
         price.value = f.priceChange(routeLength: stationNum.value);
         exchangeState.value=true;
         exchangeState2.value=true;
+        f.line3.remove("KitKat");
+        f.line3.remove("Sudan");
+        f.line3.remove("Imbaba");
+        f.line3.remove("El Bohy");
+        f.line3.remove("El-Qawmia");
+        f.line3.remove("Ring Road");
+        f.line3.remove("Rod El Farag Corridor");
       }else if(f.line2.contains(startStation.value)&&(f.line3.contains(endStation.value)  ||f. line3Pt2.contains(endStation.value)))//////////FROM 2 TO 3 CAIRO UNIVERSITY
           {
         f.line3.addAll(f.line3Pt2);
@@ -207,6 +220,12 @@ class detailsPage extends StatelessWidget {
         price.value =f. priceChange(routeLength: stationNum.value);
         exchangeState.value=true;
         exchangeState2.value=true;
+        f.line3.remove("KitKat");
+        f.line3.remove("Tawfikia");
+        f.line3.remove("Wadi El Nile");
+        f.line3.remove("Gamet El Dowal");
+        f.line3.remove("Bulaq El Dakrour");
+        f.line3.remove("Cairo University");
       }
       else if(f.line2.contains(startStation.value)&&(f.line3.contains(endStation.value)  ||f. line3Pt3.contains(endStation.value)))//////////FROM 2 TO 3 ROD EL FARAG
           {
@@ -221,11 +240,16 @@ class detailsPage extends StatelessWidget {
         price.value =f. priceChange(routeLength: stationNum.value);
         exchangeState.value=true;
         exchangeState2.value=true;
+        f.line3.remove("KitKat");
+        f.line3.remove("Sudan");
+        f.line3.remove("Imbaba");
+        f.line3.remove("El Bohy");
+        f.line3.remove("El-Qawmia");
+        f.line3.remove("Ring Road");
+        f.line3.remove("Rod El Farag Corridor");
       }else if((f.line3.contains(startStation.value) ||f. line3Pt2.contains(startStation.value))&&f.line1.contains(endStation.value))////////////////////////////////////////FROM 3 TO 1 CAIRO UNIVERSITY
           {
         f.line3.addAll(f.line3Pt2);
-
-
         route.value = f.routeExchange(metroLine1:f. line3, metroLine2:f. line1, exchangeList:f. exchangeStations, start: startStation.value, end: endStation.value);
         stationNum.value = f.routeExchangeLength(metroLine1:f. line3, metroLine2: f.line1, exchangeList:f. exchangeStations, start: startStation.value, end: endStation.value);
         time.value = f.routeExchangeLength(metroLine1:f. line3, metroLine2:f. line1, exchangeList:f. exchangeStations, start: startStation.value, end: endStation.value)*2.0;
@@ -235,6 +259,12 @@ class detailsPage extends StatelessWidget {
         price.value =f. priceChange(routeLength: stationNum.value);
         exchangeState.value=true;
         exchangeState2.value=true;
+        f.line3.remove("KitKat");
+        f.line3.remove("Tawfikia");
+        f.line3.remove("Wadi El Nile");
+        f.line3.remove("Gamet El Dowal");
+        f.line3.remove("Bulaq El Dakrour");
+        f.line3.remove("Cairo University");
       }
       else if((f.line3.contains(startStation.value) || f.line3Pt2.contains(startStation.value))&&f.line2.contains(endStation.value))////////////////////////////////////////FROM 3 TO 2 CAIRO UNIVERSITY
           {
@@ -248,6 +278,12 @@ class detailsPage extends StatelessWidget {
         price.value =f. priceChange(routeLength: stationNum.value);
         exchangeState.value=true;
         exchangeState2.value=true;
+        f.line3.remove("KitKat");
+        f.line3.remove("Tawfikia");
+        f.line3.remove("Wadi El Nile");
+        f.line3.remove("Gamet El Dowal");
+        f.line3.remove("Bulaq El Dakrour");
+        f.line3.remove("Cairo University");
       }
       else if((f.line3.contains(startStation.value) ||f. line3Pt3.contains(startStation.value))&&f.line1.contains(endStation.value))////////////////////////////////////////FROM 3 TO 1 ROD EL FARAG
           {
@@ -261,6 +297,13 @@ class detailsPage extends StatelessWidget {
         price.value = f.priceChange(routeLength: stationNum.value);
         exchangeState.value=true;
         exchangeState2.value=true;
+        f.line3.remove("KitKat");
+        f.line3.remove("Sudan");
+        f.line3.remove("Imbaba");
+        f.line3.remove("El Bohy");
+        f.line3.remove("El-Qawmia");
+        f.line3.remove("Ring Road");
+        f.line3.remove("Rod El Farag Corridor");
       }
       else if((f.line3.contains(startStation.value) || f.line3Pt3.contains(startStation.value))&&f.line2.contains(endStation.value))////////////////////////////////////////FROM 3 TO 2 ROD EL FARAG
           {
@@ -273,7 +316,14 @@ class detailsPage extends StatelessWidget {
         direction2.value = f.directionChange(start: exchangeStation.value, end: endStation.value, metroLine: f.line2);
         price.value =f. priceChange(routeLength: stationNum.value);
         exchangeState.value=true;
-        exchangeState2.value=true;}
+        exchangeState2.value=true;
+        f.line3.remove("KitKat");
+        f.line3.remove("Sudan");
+        f.line3.remove("Imbaba");
+        f.line3.remove("El Bohy");
+        f.line3.remove("El-Qawmia");
+        f.line3.remove("Ring Road");
+        f.line3.remove("Rod El Farag Corridor");}
 
     }
 values();
