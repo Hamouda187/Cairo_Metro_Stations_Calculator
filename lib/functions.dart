@@ -1,4 +1,4 @@
-class Functions{
+class Functions {
   final line1 = [
     'New El-Marg',
     'El-Marg',
@@ -92,7 +92,7 @@ class Functions{
     "Bulaq El Dakrour",
     "Cairo University"
   ];
-  var line3Pt3= [
+  var line3Pt3 = [
     "KitKat",
     "Sudan",
     "Imbaba",
@@ -119,8 +119,8 @@ class Functions{
   int stationNum;
   double time;
   String exchangeStation;
-  bool exchangeState =false;
-  bool exchangeState2 =false;
+  bool exchangeState = false;
+  bool exchangeState2 = false;
 
 
   final String startStation;
@@ -129,9 +129,7 @@ class Functions{
 
   Functions(this.price, this.direction1, this.direction2, this.route,
       this.stationNum, this.time, this.exchangeState2, this.startStation,
-      this.endStation,this.exchangeStation);
-
-
+      this.endStation, this.exchangeStation);
 
 
   int calculations(int startIndex, int endIndex) {
@@ -147,7 +145,6 @@ class Functions{
       return 20;
     }
   }
-
 
 
   String routePrint(int endIndex, int startIndex, List<String> metroLine) {
@@ -184,46 +181,43 @@ class Functions{
     }
   }
 
-  String routeExchange({required List<String> metroLine1,required List<String> metroLine2,required List<String> exchangeList
-    ,required String start, required String end})
-  {
-
-    final exchangeStation = nearestStation(metroLine1: metroLine1, metroLine2: metroLine2, exchangeList: exchangeList, start: start, end: end);
+  String routeExchange({required List<String> metroLine1, required List<
+      String> metroLine2, required List<String> exchangeList
+    , required String start, required String end}) {
+    final exchangeStation = nearestStation(metroLine1: metroLine1,
+        metroLine2: metroLine2,
+        exchangeList: exchangeList,
+        start: start,
+        end: end);
     final Set<String> routeSet = <String>{};
     final startIndex = metroLine1.indexOf(start);
     final endIndex = metroLine2.indexOf(end);
     var counter = startIndex;
     var exchangeIndex = 0; // empty exchange index
-    exchangeIndex = metroLine1.indexOf(exchangeStation); // set the exchange index to the nearest one to the start
-    if(exchangeIndex>startIndex)
-    {
-      while(counter<=exchangeIndex)
-      {
-        routeSet.add(metroLine1[counter]);//adding the stations to the route
+    exchangeIndex = metroLine1.indexOf(
+        exchangeStation); // set the exchange index to the nearest one to the start
+    if (exchangeIndex > startIndex) {
+      while (counter <= exchangeIndex) {
+        routeSet.add(metroLine1[counter]); //adding the stations to the route
         counter++;
       }
-    }else if(exchangeIndex<startIndex)
-    {
-      while(counter>=exchangeIndex)
-      {
-        routeSet.add(metroLine1[counter]);//adding the stations to the route
+    } else if (exchangeIndex < startIndex) {
+      while (counter >= exchangeIndex) {
+        routeSet.add(metroLine1[counter]); //adding the stations to the route
         counter--;
       }
     }
-    exchangeIndex = metroLine2.indexOf(exchangeStation);//change the exchange index to be line 2
-    counter=exchangeIndex;
-    if(exchangeIndex>endIndex)
-    {
-      while(counter>=endIndex)
-      {
-        routeSet.add(metroLine2[counter]);//adding the stations to the route
+    exchangeIndex = metroLine2.indexOf(
+        exchangeStation); //change the exchange index to be line 2
+    counter = exchangeIndex;
+    if (exchangeIndex > endIndex) {
+      while (counter >= endIndex) {
+        routeSet.add(metroLine2[counter]); //adding the stations to the route
         counter--;
       }
-    }else if(exchangeIndex<endIndex)
-    {
-      while(counter<=endIndex)
-      {
-        routeSet.add(metroLine2[counter]);//adding the stations to the route
+    } else if (exchangeIndex < endIndex) {
+      while (counter <= endIndex) {
+        routeSet.add(metroLine2[counter]); //adding the stations to the route
         counter++;
       }
     }
@@ -231,89 +225,91 @@ class Functions{
     calculations(0, routeSet.length);
     return ('Route : ${route.join(' => ')}');
   }
-  String nearestStation({required List<String> metroLine1,required List<String> metroLine2,required List<String> exchangeList
-    ,required String start, required String end})
-  {
+
+  String nearestStation({required List<String> metroLine1, required List<
+      String> metroLine2, required List<String> exchangeList
+    , required String start, required String end}) {
     final startIndex = metroLine1.indexOf(start);
     final metroLine1Set = metroLine1.toSet();
     final metroLine2Set = metroLine2.toSet();
     var exchangeIndex = 0; // empty exchange index
-    var miniDistance = metroLine1.length; //mini distance to see the distance between start and the nearest exchange station
+    var miniDistance = metroLine1
+        .length; //mini distance to see the distance between start and the nearest exchange station
     var nearestChangeStation = ''; //empty nearest exchange station
     for (int i = 0; i < exchangeList.length; i++) {
-      if(metroLine1Set.contains(exchangeList[i])&& metroLine2Set.contains(exchangeList[i])) // check that the 2 lines have the same exchange stations
+      if (metroLine1Set.contains(exchangeList[i]) && metroLine2Set.contains(
+          exchangeList[i])) // check that the 2 lines have the same exchange stations
           {
         exchangeIndex = metroLine1.indexOf(exchangeList[i]);
-        var distance = (startIndex-exchangeIndex).abs(); // check the distance between start and exchange station
+        var distance = (startIndex - exchangeIndex)
+            .abs(); // check the distance between start and exchange station
 
-        if(distance<miniDistance)// if the new distance is less than the old one add the new one
+        if (distance <
+            miniDistance) // if the new distance is less than the old one add the new one
             {
-          miniDistance=distance;
+          miniDistance = distance;
           nearestChangeStation = metroLine1[exchangeIndex];
         }
-
       }
     }
     return nearestChangeStation;
   }
-  String directionChange({required String start, required String end, required List<String> metroLine})
-  {
-    if(metroLine.indexOf(start) > metroLine.indexOf(end))
-    {
+
+  String directionChange(
+      {required String start, required String end, required List<
+          String> metroLine}) {
+    if (metroLine.indexOf(start) > metroLine.indexOf(end)) {
       return metroLine[0];
-    }else {
-      return metroLine[metroLine.length-1];
+    } else {
+      return metroLine[metroLine.length - 1];
     }
   }
 
-  int routeExchangeLength({required List<String> metroLine1,required List<String> metroLine2,required List<String> exchangeList
-    ,required String start, required String end})
-  {
-
-    final exchangeStation = nearestStation(metroLine1: metroLine1, metroLine2: metroLine2, exchangeList: exchangeList, start: start, end: end);
+  int routeExchangeLength({required List<String> metroLine1, required List<
+      String> metroLine2, required List<String> exchangeList
+    , required String start, required String end}) {
+    final exchangeStation = nearestStation(metroLine1: metroLine1,
+        metroLine2: metroLine2,
+        exchangeList: exchangeList,
+        start: start,
+        end: end);
     final Set<String> routeSet = <String>{};
     final startIndex = metroLine1.indexOf(start);
     final endIndex = metroLine2.indexOf(end);
     var counter = startIndex;
     var exchangeIndex = 0; // empty exchange index
-    exchangeIndex = metroLine1.indexOf(exchangeStation); // set the exchange index to the nearest one to the start
-    if(exchangeIndex>startIndex)
-    {
-      while(counter<=exchangeIndex)
-      {
-        routeSet.add(metroLine1[counter]);//adding the stations to the route
+    exchangeIndex = metroLine1.indexOf(
+        exchangeStation); // set the exchange index to the nearest one to the start
+    if (exchangeIndex > startIndex) {
+      while (counter <= exchangeIndex) {
+        routeSet.add(metroLine1[counter]); //adding the stations to the route
         counter++;
       }
-    }else if(exchangeIndex<startIndex)
-    {
-      while(counter>=exchangeIndex)
-      {
-        routeSet.add(metroLine1[counter]);//adding the stations to the route
+    } else if (exchangeIndex < startIndex) {
+      while (counter >= exchangeIndex) {
+        routeSet.add(metroLine1[counter]); //adding the stations to the route
         counter--;
       }
     }
-    exchangeIndex = metroLine2.indexOf(exchangeStation);//change the exchange index to be line 2
-    counter=exchangeIndex;
-    if(exchangeIndex>endIndex)
-    {
-      while(counter>=endIndex)
-      {
-        routeSet.add(metroLine2[counter]);//adding the stations to the route
+    exchangeIndex = metroLine2.indexOf(
+        exchangeStation); //change the exchange index to be line 2
+    counter = exchangeIndex;
+    if (exchangeIndex > endIndex) {
+      while (counter >= endIndex) {
+        routeSet.add(metroLine2[counter]); //adding the stations to the route
         counter--;
       }
-    }else if(exchangeIndex<endIndex)
-    {
-      while(counter<=endIndex)
-      {
-        routeSet.add(metroLine2[counter]);//adding the stations to the route
+    } else if (exchangeIndex < endIndex) {
+      while (counter <= endIndex) {
+        routeSet.add(metroLine2[counter]); //adding the stations to the route
         counter++;
       }
     }
 
     return routeSet.length;
   }
-  int priceChange({required int routeLength})
-  {
+
+  int priceChange({required int routeLength}) {
     if (routeLength <= 9) {
       return 8;
     } else if (routeLength <= 16) {
@@ -324,6 +320,4 @@ class Functions{
       return 20;
     }
   }
-
-
 }

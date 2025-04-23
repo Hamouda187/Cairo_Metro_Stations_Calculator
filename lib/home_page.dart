@@ -2,10 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'stations_page.dart';
 
-class homePage extends StatelessWidget {
+class homePage extends StatefulWidget {
   homePage({super.key});
 
+  @override
+  State<homePage> createState() => _homePageState();
+}
+
+class _homePageState extends State<homePage> {
   final nameCont = TextEditingController();
+
   var enabled = false.obs;
 
   @override
@@ -49,5 +55,10 @@ class homePage extends StatelessWidget {
         ),
       ),
     );
+  }
+  @override
+  void dispose() {
+    nameCont.dispose();
+    super.dispose();
   }
 }

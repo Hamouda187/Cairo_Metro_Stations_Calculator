@@ -2,12 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:metro_app/details_page.dart';
 
-class stationsPage extends StatelessWidget {
+class stationsPage extends StatefulWidget {
   stationsPage({super.key});
 
+  @override
+  State<stationsPage> createState() => _stationsPageState();
+}
 
+class _stationsPageState extends State<stationsPage> {
   final startCont = TextEditingController();
+
   final endCont = TextEditingController();
+
   final stations = [
     'New El-Marg',
     'El-Marg',
@@ -53,10 +59,8 @@ class stationsPage extends StatelessWidget {
     'Khalafawy',
     'Mezallat',
     'Sakia Mekki',
-    'Al-Shohadaa',
     'Ataba',
     'Mohamed Naguib',
-    'Sadat',
     'Opera',
     'Dokki',
     'El Behoos',
@@ -85,12 +89,9 @@ class stationsPage extends StatelessWidget {
     "Abdou Pasha",
     "El Geish",
     "Bab El Shaaria",
-    "Ataba",
-    "Nasser",
     "Maspero",
     "Safaa Hegazy",
-    "KitKat"
-    ,
+    "KitKat",
     "Tawfikia",
     "Wadi El Nile",
     'Gamet El Dowal',
@@ -103,6 +104,7 @@ class stationsPage extends StatelessWidget {
     "Ring Road",
     "Rod El Farag Corridor"
   ];
+
   var openButton = false.obs;
 
   @override
@@ -195,5 +197,10 @@ class stationsPage extends StatelessWidget {
       ),
     );
   }
-
+  @override
+  void dispose() {
+    startCont.dispose();
+    endCont.dispose();
+    super.dispose();
+  }
 }
